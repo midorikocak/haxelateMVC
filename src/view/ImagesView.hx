@@ -15,5 +15,6 @@ class ImagesView extends AppView<String>
     **/
     public function new()
     {
+        super();
     }
 }

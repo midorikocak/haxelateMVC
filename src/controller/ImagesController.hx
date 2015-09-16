@@ -12,7 +12,7 @@ typedef Controller = AppController<Int,Image,String>;
 class ImagesController extends Controller
 {
     public function new(){
-
+        super();
     }
 
     public function getData(){

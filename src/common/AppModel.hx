@@ -10,6 +10,12 @@ class AppModel<TId,TValue,TOutput> implements ModelInterface<TId,TValue>
     var data(default,set_data):Map<TId,TValue>;
     public var modelController:ControllerInterface<TId,TValue,TOutput>;
 
+    /*
+    public function new(contoller:AppController){
+        this.modelController = controller;
+    }
+    */
+
     public function create(value:TValue):TId{
         // abstract
         return cast 5;
@@ -33,7 +39,7 @@ class AppModel<TId,TValue,TOutput> implements ModelInterface<TId,TValue>
     public function set_data(data:Map<TId,TValue>){
         if(this.data != data){
             this.data = data;
-            this.modelController.index();
+            modelController.index();
         }
         return data;
     }

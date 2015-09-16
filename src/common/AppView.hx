@@ -7,6 +7,10 @@ package common;
 **/
 class AppView<TOutput> implements ViewInterface<TOutput>
 {
+    public function new(){
+
+    }
+
   public function render(value:Dynamic):TOutput{
       trace(value);
       return cast value;

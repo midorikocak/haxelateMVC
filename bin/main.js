@@ -32,18 +32,18 @@ List.prototype = {
 var Main = function() {
 };
 Main.main = function() {
-	var imagesView = new view.ImagesView();
 	var imagesModel = new model.ImagesModel();
 	var imagesController = new controller.ImagesController();
 	imagesModel.modelController = imagesController;
 	imagesController.controllerModel = imagesModel;
-	imagesController.controllerView = imagesView;
 	imagesController.index();
 };
 var IMap = function() { };
 var common = {};
 common.ControllerInterface = function() { };
-common.AppController = function() { };
+common.AppController = function() {
+	this.controllerView = new common.AppView();
+};
 common.AppController.__interfaces__ = [common.ControllerInterface];
 common.AppController.prototype = {
 	add: function(value) {
@@ -90,7 +90,8 @@ common.AppModel.prototype = {
 	}
 };
 common.ViewInterface = function() { };
-common.AppView = function() { };
+common.AppView = function() {
+};
 common.AppView.__interfaces__ = [common.ViewInterface];
 common.AppView.prototype = {
 	render: function(value) {
@@ -100,6 +101,7 @@ common.AppView.prototype = {
 };
 var controller = {};
 controller.ImagesController = function() {
+	common.AppController.call(this);
 };
 controller.ImagesController.__super__ = common.AppController;
 controller.ImagesController.prototype = $extend(common.AppController.prototype,{
@@ -227,6 +229,7 @@ model.ImagesModel.prototype = $extend(common.AppModel.prototype,{
 });
 var view = {};
 view.ImagesView = function() {
+	common.AppView.call(this);
 };
 view.ImagesView.__super__ = common.AppView;
 view.ImagesView.prototype = $extend(common.AppView.prototype,{

@@ -19,12 +19,10 @@ class Main
 
     public static function main()
     {
-        var imagesView = new ImagesView();
         var imagesModel = new ImagesModel();
         var imagesController = new ImagesController();
         imagesModel.modelController = imagesController;
         imagesController.controllerModel = imagesModel;
-        imagesController.controllerView = imagesView;
 
         imagesController.index();
     }
