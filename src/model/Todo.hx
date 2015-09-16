@@ -15,6 +15,8 @@ class Todo
     **/
     public function new()
     {
+        title = "";
+        isCompleted = false;
     }
 
     public function get_title():String{

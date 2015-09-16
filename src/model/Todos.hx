@@ -5,6 +5,7 @@ package model;
 * @author Midori Kocak github.com/mtkocak
 * @package model
 **/
+import js.html.Storage;
 class Todos
 {
     var list(default,set_list):List<Todo>;
@@ -14,6 +15,7 @@ class Todos
     **/
     public function new()
     {
+        list = new List<Todo>();
     }
 
     public function get_list():List<Todo>{
@@ -25,7 +27,11 @@ class Todos
         return list;
     }
 
-    public function add(todo:Todo){
+    public function add(todo:Todo):Void{
         this.list.add(todo);
+    }
+
+    public function delete(todo:Todo):Void{
+        this.list.remove(todo);
     }
 }

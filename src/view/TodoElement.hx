@@ -23,7 +23,7 @@ class TodoElement
     * Class Constructor
     * @return void
     **/
-    public function new(title:String,isCompleted:Bool)
+    public function new(?title:String,?isCompleted:Bool = false)
     {
         this.title = title;
         this.isCompleted = isCompleted;

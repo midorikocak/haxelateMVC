@@ -4,6 +4,11 @@ package ;
 *
 * @package
 **/
+import view.TodoElement;
+import controller.TodoController;
+import view.TodoView;
+import model.Todo;
+import js.html.Storage;
 import haxe.Json;
 import haxe.Http;
 import model.Todos;
@@ -21,8 +26,35 @@ class Main
 
     public static function main()
     {
-        //getData();
+        var todos:Todos = getTodos();
+        var todosView:TodosView = new TodosView();
+
+        var todosController:TodosController = new TodosController(todos,todosView);
+
+        todosController.updateView();
     }
+
+    public static function getTodoElement(title:String,isCompleted:Bool):TodoElement{
+        var todo:Todo = getTodo();
+        var todoView:TodoView = new TodoView();
+
+        var todoController:TodoController = new TodoController();
+        return todoController.updateView();
+    }
+
+    public static function getTodos(){
+        var todos = new Todos();
+        return todos;
+    }
+
+    public static function getTodo(title:String,isCompleted:Bool){
+        var todo:Todo = new Todo();
+        todo.set_title(title);
+        todo.set_isCompleted(isCompleted);
+        return todo;
+    }
+
+
 
     /*
     public static function getImages(imagesModel:Images){

@@ -16,8 +16,10 @@ class TodoController
     * Class Constructor
     * @return void
     **/
-    public function new()
+    public function new(model:Todo,view:TodoView)
     {
+        this.model = model;
+        this.view = view;
     }
 
     public function setIsCompleted(isCompleted:Bool):Void{
@@ -37,6 +39,6 @@ class TodoController
     }
 
     public function updateView(){
-
+        return this.view.updateTodo(this.model.get_title(),this.model.get_isCompleted());
     }
 }

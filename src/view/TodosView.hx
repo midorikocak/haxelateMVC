@@ -12,6 +12,7 @@ import js.html.ImageElement;
 import js.html.Element;
 class TodosView
 {
+    var todoListElement:Element = Browser.document.createElement('ul');
     /**
     * Class Constructor
     * @return void
@@ -20,8 +21,9 @@ class TodosView
     {
     }
 
-    public function showTodos(list:List<Todo>){
-
+    public function updateTodos(list:List<Todo>){
+        this.todoListElement.innerHTML = "";
+        js.Browser.document.body.appendChild(this.todoListElement);
     }
 /*
     public function showImages(data:Array<Image>):Void{
