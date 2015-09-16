@@ -6,9 +6,9 @@ package ;
 **/
 import haxe.Json;
 import haxe.Http;
-import model.Images;
-import view.ImagesView;
-import controller.ImagesController;
+import model.Todos;
+import view.TodosView;
+import controller.TodosController;
 class Main
 {
     /**
@@ -21,15 +21,18 @@ class Main
 
     public static function main()
     {
-        getData();
+        //getData();
     }
 
+    /*
     public static function getImages(imagesModel:Images){
-        var imagesView = new ImagesView();
-        var imagesController = new ImagesController(imagesModel,imagesView);
+        var imagesView = new TodosView();
+        var imagesController = new TodosController(imagesModel,imagesView);
         imagesController.updateView();
     }
+    */
 
+    /*
     public static function getData(){
         var asyncData:Http = new Http('data/data.json');
         asyncData.onData = function(data){
@@ -39,4 +42,5 @@ class Main
         }
         asyncData.request(true);
     }
+    */
 }
