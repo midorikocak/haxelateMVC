@@ -164,7 +164,20 @@ view.ImagesView = function() {
 };
 view.ImagesView.prototype = {
 	showImages: function(data) {
-		console.log(data);
+		var imagesElement = window.document.createElement("ul");
+		var _g = 0;
+		while(_g < data.length) {
+			var item = data[_g];
+			++_g;
+			var listElement = window.document.createElement("li");
+			var imageElement;
+			var _this = window.document;
+			imageElement = _this.createElement("img");
+			imageElement.src = item.src;
+			listElement.appendChild(imageElement);
+			imagesElement.appendChild(listElement);
+		}
+		window.document.body.appendChild(imagesElement);
 	}
 };
 Main.main();
