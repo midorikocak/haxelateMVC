@@ -1,28 +1,35 @@
 package controller;
 /**
-* UsersController
-*
+* ImagesController
+* 
+* @author Midori Kocak github.com/mtkocak
 * @package controller
 **/
-import model.ImagesModel.Image;
-import common.AppController;
-import haxe.Http;
-import haxe.Json;
-typedef Controller = AppController<Int,Image,String>;
-class ImagesController extends Controller
+import view.ImagesView;
+import model.Images;
+class ImagesController
 {
-    public function new(){
-
+    var model:Images;
+    var view:ImagesView;
+    /**
+    * Class Constructor
+    * @return void
+    **/
+    public function new(model:Images,view:ImagesView)
+    {
+        this.model = model;
+        this.view = view;
     }
 
-    public function getData(){
-        var asyncData:Http = new Http('data/data.json');
-        asyncData.onData = function(data){
-            trace('async data loaded');
-            //this.controllerModel.set_data(Json.parse(data));
-        }
-        asyncData.request(true);
+    public function getImages():Array<Image>{
+        return this.model.get_images();
+    }
+
+    public function setImages(images:Array<Image>):Void{
+        this.model.set_images(images);
+    }
+
+    public function updateView(){
+        this.view.showImages(this.model.get_images());
     }
 }
-
-

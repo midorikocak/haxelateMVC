@@ -4,7 +4,9 @@ package ;
 *
 * @package
 **/
-import model.ImagesModel;
+import haxe.Json;
+import haxe.Http;
+import model.Images;
 import view.ImagesView;
 import controller.ImagesController;
 class Main
@@ -19,13 +21,22 @@ class Main
 
     public static function main()
     {
-        var imagesView = new ImagesView();
-        var imagesModel = new ImagesModel();
-        var imagesController = new ImagesController();
-        imagesModel.modelController = imagesController;
-        imagesController.controllerModel = imagesModel;
-        imagesController.controllerView = imagesView;
+        getData();
+    }
 
-        imagesController.index();
+    public static function getImages(imagesModel:Images){
+        var imagesView = new ImagesView();
+        var imagesController = new ImagesController(imagesModel,imagesView);
+        imagesController.updateView();
+    }
+
+    public static function getData(){
+        var asyncData:Http = new Http('data/data.json');
+        asyncData.onData = function(data){
+            var images:Images = new Images();
+            images.set_images(Json.parse(data));
+            getImages(images);
+        }
+        asyncData.request(true);
     }
 }

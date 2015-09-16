@@ -1,10 +1,4 @@
 (function () { "use strict";
-function $extend(from, fields) {
-	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
-	for (var name in fields) proto[name] = fields[name];
-	if( fields.toString !== Object.prototype.toString ) proto.toString = fields.toString;
-	return proto;
-}
 var Lambda = function() { };
 Lambda.exists = function(it,f) {
 	var $it0 = it.iterator();
@@ -32,85 +26,38 @@ List.prototype = {
 var Main = function() {
 };
 Main.main = function() {
+	Main.getData();
+};
+Main.getImages = function(imagesModel) {
 	var imagesView = new view.ImagesView();
-	var imagesModel = new model.ImagesModel();
-	var imagesController = new controller.ImagesController();
-	imagesModel.modelController = imagesController;
-	imagesController.controllerModel = imagesModel;
-	imagesController.controllerView = imagesView;
-	imagesController.index();
+	var imagesController = new controller.ImagesController(imagesModel,imagesView);
+	imagesController.updateView();
 };
-var IMap = function() { };
-var common = {};
-common.ControllerInterface = function() { };
-common.AppController = function() { };
-common.AppController.__interfaces__ = [common.ControllerInterface];
-common.AppController.prototype = {
-	add: function(value) {
-		return this.controllerView.render(this.controllerModel.create(value));
-	}
-	,edit: function(id,value) {
-		return this.controllerView.render(this.controllerModel.update(id,value));
-	}
-	,index: function() {
-		return this.controllerView.render(this.controllerModel.get_data());
-	}
-	,view: function(id) {
-		return this.controllerView.render(this.controllerModel.read(id));
-	}
-	,'delete': function(id) {
-		return this.controllerView.render(this.controllerModel["delete"](id));
-	}
-};
-common.ModelInterface = function() { };
-common.AppModel = function() { };
-common.AppModel.__interfaces__ = [common.ModelInterface];
-common.AppModel.prototype = {
-	create: function(value) {
-		return 5;
-	}
-	,read: function(id) {
-		return this.data.get(id);
-	}
-	,update: function(id,value) {
-		return this.data.set(id,value);
-	}
-	,'delete': function(id) {
-		return this.data.remove(id);
-	}
-	,get_data: function() {
-		return this.data;
-	}
-	,set_data: function(data) {
-		if(this.data != data) {
-			this.data = data;
-			this.modelController.index();
-		}
-		return data;
-	}
-};
-common.ViewInterface = function() { };
-common.AppView = function() { };
-common.AppView.__interfaces__ = [common.ViewInterface];
-common.AppView.prototype = {
-	render: function(value) {
-		console.log(value);
-		return value;
-	}
+Main.getData = function() {
+	var asyncData = new haxe.Http("data/data.json");
+	asyncData.onData = function(data) {
+		var images = new model.Images();
+		images.set_images(JSON.parse(data));
+		Main.getImages(images);
+	};
+	asyncData.request(true);
 };
 var controller = {};
-controller.ImagesController = function() {
+controller.ImagesController = function(model,view) {
+	this.model = model;
+	this.view = view;
 };
-controller.ImagesController.__super__ = common.AppController;
-controller.ImagesController.prototype = $extend(common.AppController.prototype,{
-	getData: function() {
-		var asyncData = new haxe.Http("data/data.json");
-		asyncData.onData = function(data) {
-			console.log("async data loaded");
-		};
-		asyncData.request(true);
+controller.ImagesController.prototype = {
+	getImages: function() {
+		return this.model.get_images();
 	}
-});
+	,setImages: function(images) {
+		this.model.set_images(images);
+	}
+	,updateView: function() {
+		this.view.showImages(this.model.get_images());
+	}
+};
 var haxe = {};
 haxe.Http = function(url) {
 	this.url = url;
@@ -193,24 +140,6 @@ haxe.Http.prototype = {
 	,onStatus: function(status) {
 	}
 };
-haxe.ds = {};
-haxe.ds.IntMap = function() {
-	this.h = { };
-};
-haxe.ds.IntMap.__interfaces__ = [IMap];
-haxe.ds.IntMap.prototype = {
-	set: function(key,value) {
-		this.h[key] = value;
-	}
-	,get: function(key) {
-		return this.h[key];
-	}
-	,remove: function(key) {
-		if(!this.h.hasOwnProperty(key)) return false;
-		delete(this.h[key]);
-		return true;
-	}
-};
 var js = {};
 js.Browser = function() { };
 js.Browser.createXMLHttpRequest = function() {
@@ -219,17 +148,24 @@ js.Browser.createXMLHttpRequest = function() {
 	throw "Unable to create XMLHttpRequest object.";
 };
 var model = {};
-model.ImagesModel = function() {
-	this.set_data(new haxe.ds.IntMap());
+model.Images = function() {
 };
-model.ImagesModel.__super__ = common.AppModel;
-model.ImagesModel.prototype = $extend(common.AppModel.prototype,{
-});
+model.Images.prototype = {
+	get_images: function() {
+		return this.images;
+	}
+	,set_images: function(images) {
+		this.images = images;
+		return images;
+	}
+};
 var view = {};
 view.ImagesView = function() {
 };
-view.ImagesView.__super__ = common.AppView;
-view.ImagesView.prototype = $extend(common.AppView.prototype,{
-});
+view.ImagesView.prototype = {
+	showImages: function(data) {
+		console.log(data);
+	}
+};
 Main.main();
 })();

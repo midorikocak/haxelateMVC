@@ -1,13 +1,11 @@
 package view;
 /**
 * ImagesView
-*
+* 
+* @author Midori Kocak github.com/mtkocak
 * @package view
 **/
-import controller.ImagesController;
-import common.AppView;
-import js.html.Image;
-class ImagesView extends AppView<String>
+class ImagesView
 {
     /**
     * Class Constructor
@@ -15,5 +13,9 @@ class ImagesView extends AppView<String>
     **/
     public function new()
     {
+    }
+
+    public function showImages(data:Dynamic):Void{
+        trace(data);
     }
 }
