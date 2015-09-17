@@ -5,14 +5,9 @@ package view;
 * @author Midori Kocak github.com/mtkocak
 * @package view
 **/
-import model.Todo;
-import model.Todos;
-import js.Browser;
-import js.html.ImageElement;
-import js.html.Element;
 class TodosView
 {
-    var todoListElement:Element = Browser.document.createElement('ul');
+    public var todosElement:TodosElement = new TodosElement();
     /**
     * Class Constructor
     * @return void
@@ -21,10 +16,16 @@ class TodosView
     {
     }
 
-    public function updateTodos(list:List<Todo>){
-        this.todoListElement.innerHTML = "";
-        js.Browser.document.body.appendChild(this.todoListElement);
+    public function add(?title:String = "",?isCompleted:Bool = false):Void{
+        var todoView:TodoView = new TodoView();
+        todoView.updateTodo(title,isCompleted);
+        todosElement.add(todoView.todoElement);
     }
+
+    public function clear(){
+        todosElement.clear();
+    }
+
 /*
     public function showImages(data:Array<Image>):Void{
         var imagesElement:Element = Browser.document.createElement('ul');

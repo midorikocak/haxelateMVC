@@ -4,6 +4,7 @@ package ;
 *
 * @package
 **/
+import view.AppElement;
 import view.TodoElement;
 import controller.TodoController;
 import view.TodoView;
@@ -26,20 +27,19 @@ class Main
 
     public static function main()
     {
+        var appElement:AppElement = new AppElement();
         var todos:Todos = getTodos();
         var todosView:TodosView = new TodosView();
+        appElement.sectionElement.appendChild(todosView.todosElement.todosElement);
 
         var todosController:TodosController = new TodosController(todos,todosView);
+        todosController.add('mahmut',false);
 
         todosController.updateView();
-    }
 
-    public static function getTodoElement(title:String,isCompleted:Bool):TodoElement{
-        var todo:Todo = getTodo();
-        var todoView:TodoView = new TodoView();
+        todosController.add('osman',true);
 
-        var todoController:TodoController = new TodoController();
-        return todoController.updateView();
+        todosController.updateView();
     }
 
     public static function getTodos(){
@@ -47,10 +47,8 @@ class Main
         return todos;
     }
 
-    public static function getTodo(title:String,isCompleted:Bool){
+    public static function getTodo(){
         var todo:Todo = new Todo();
-        todo.set_title(title);
-        todo.set_isCompleted(isCompleted);
         return todo;
     }
 

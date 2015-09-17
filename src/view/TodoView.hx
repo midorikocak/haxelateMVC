@@ -17,8 +17,7 @@ class TodoView
         this.todoElement = new TodoElement();
     }
 
-    public function updateTodo(title:String,isCompleted:Bool):TodoElement{
+    public function updateTodo(title:String,isCompleted:Bool){
         this.todoElement.update(title,isCompleted);
-        return this.todoElement;
     }
 }

@@ -38,20 +38,59 @@ List.prototype = {
 var Main = function() {
 };
 Main.main = function() {
+	var appElement = new view.AppElement();
 	var todos = Main.getTodos();
 	var todosView = new view.TodosView();
+	appElement.sectionElement.appendChild(todosView.todosElement.todosElement);
+	(function(f,e) {
+		return function() {
+			return f(e);
+		};
+	})($bind(appElement,appElement.doSomething),function(e1) {
+		console.log("mahmut");
+	});
 	var todosController = new controller.TodosController(todos,todosView);
+	todosController.add("mahmut",false);
+	todosController.updateView();
+	todosController.add("osman",true);
 	todosController.updateView();
 };
 Main.getTodos = function() {
-	var model1 = new model.Todos();
-	return model1;
+	var todos = new model.Todos();
+	return todos;
 };
 Main.getTodo = function() {
-	var model1 = new model.Todo();
-	return model1;
+	var todo = new model.Todo();
+	return todo;
 };
 var controller = {};
+controller.TodoController = function() {
+};
+controller.TodoController.prototype = {
+	set_model: function(model) {
+		this.model = model;
+		return model;
+	}
+	,set_view: function(view) {
+		this.view = view;
+		return view;
+	}
+	,setIsCompleted: function(isCompleted) {
+		this.model.set_isCompleted(isCompleted);
+	}
+	,getIsCompleted: function() {
+		return this.model.get_isCompleted();
+	}
+	,getTitle: function() {
+		return this.model.get_title();
+	}
+	,setTitle: function(title) {
+		this.model.set_title(title);
+	}
+	,updateView: function() {
+		this.view.updateTodo(this.model.get_title(),this.model.get_isCompleted());
+	}
+};
 controller.TodosController = function(model,view) {
 	this.model = model;
 	this.view = view;
@@ -60,7 +99,10 @@ controller.TodosController.prototype = {
 	getTodos: function() {
 		return this.model.get_list();
 	}
-	,add: function(todo) {
+	,add: function(title,isCompleted) {
+		var todo = new model.Todo();
+		todo.set_title(title);
+		todo.set_isCompleted(isCompleted);
 		this.model.add(todo);
 	}
 	,'delete': function(todo) {
@@ -70,7 +112,13 @@ controller.TodosController.prototype = {
 		this.model.set_list(list);
 	}
 	,updateView: function() {
-		this.view.updateTodos(this.model.get_list());
+		var list = this.model.get_list();
+		this.view.clear();
+		var $it0 = list.iterator();
+		while( $it0.hasNext() ) {
+			var todo = $it0.next();
+			this.view.add(todo.get_title(),todo.get_isCompleted());
+		}
 	}
 };
 var model = {};
@@ -113,6 +161,27 @@ model.Todos.prototype = {
 	}
 };
 var view = {};
+view.AppElement = function() {
+	this.bodyElement = window.document.body;
+	this.inputElement = this.bodyElement.getElementsByClassName("new-todo")[0];
+	this.toggleElement = this.bodyElement.getElementsByClassName("toggle-all")[0];
+	this.toggleElement.onclick = $bind(this,this.doSomething);
+	this.sectionElement = this.bodyElement.getElementsByClassName("main")[0];
+	this.footerElement = this.bodyElement.getElementsByClassName("footer")[0];
+	this.hideSectionElement();
+	this.showSectionElement();
+};
+view.AppElement.prototype = {
+	doSomething: function(e) {
+		console.log("I did");
+	}
+	,hideSectionElement: function() {
+		this.sectionElement.style.display = "none";
+	}
+	,showSectionElement: function() {
+		this.sectionElement.style.display = "initial";
+	}
+};
 view.TodoElement = function(title,isCompleted) {
 	if(isCompleted == null) isCompleted = false;
 	this.inputElement = (function($this) {
@@ -164,14 +233,42 @@ view.TodoElement.prototype = {
 		}
 	}
 };
-view.TodosView = function() {
-	this.todoListElement = window.document.createElement("ul");
+view.TodoView = function() {
+	this.todoElement = new view.TodoElement();
 };
-view.TodosView.prototype = {
-	updateTodos: function(list) {
-		this.todoListElement.innerHTML = "";
-		window.document.body.appendChild(this.todoListElement);
+view.TodoView.prototype = {
+	updateTodo: function(title,isCompleted) {
+		this.todoElement.update(title,isCompleted);
 	}
 };
+view.TodosElement = function() {
+	this.todosElement = window.document.createElement("ul");
+	this.todosElement.className = "todo-list";
+};
+view.TodosElement.prototype = {
+	add: function(todoElement) {
+		this.todosElement.appendChild(todoElement.listElement);
+	}
+	,clear: function() {
+		this.todosElement.innerHTML = "";
+	}
+};
+view.TodosView = function() {
+	this.todosElement = new view.TodosElement();
+};
+view.TodosView.prototype = {
+	add: function(title,isCompleted) {
+		if(isCompleted == null) isCompleted = false;
+		if(title == null) title = "";
+		var todoView = new view.TodoView();
+		todoView.updateTodo(title,isCompleted);
+		this.todosElement.add(todoView.todoElement);
+	}
+	,clear: function() {
+		this.todosElement.clear();
+	}
+};
+var $_, $fid = 0;
+function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 Main.main();
 })();
