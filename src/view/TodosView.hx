@@ -15,6 +15,9 @@ class TodosView
 {
     public var todosElement:TodosElement = new TodosElement();
     public var inputElement:InputElement;
+    public var active:Element;
+    public var completed:Element;
+    public var selected:Element;
     public var viewController(default, set_viewController):TodosController;
     /**
     * Class Constructor
@@ -23,6 +26,19 @@ class TodosView
 
     public function new()
     {
+        selected = cast js.Browser.document.body.getElementsByClassName('selected')[0];
+        selected.onclick = function(e:EventListener){
+            viewController.updateView();
+        };
+
+        active = cast js.Browser.document.body.getElementsByClassName('selected')[0];
+        active.onclick = function(e:EventListener){
+            filterActive();
+        };
+        completed = cast js.Browser.document.body.getElementsByClassName('selected')[0];
+        completed.onclick = function(e:EventListener){
+            filterCompleted();
+        };
         inputElement = cast js.Browser.document.body.getElementsByClassName('new-todo')[0];
         inputElement.onkeypress = function (event:Dynamic) {
             if ((inputElement.value!="")&& (event.which == 13 || event.keyCode == 13)) {
@@ -47,6 +63,11 @@ class TodosView
         {
             delete(id);
         };
+
+        todoView.todoElement.checkBoxElement.onclick = function(e:EventListener){
+            viewController.setCompleted(id,true);
+            viewController.updateView();
+        }
         todoView.updateTodo(title, isCompleted);
         todosElement.add(todoView.todoElement);
     }

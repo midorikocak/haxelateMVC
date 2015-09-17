@@ -47,7 +47,6 @@ Main.main = function() {
 	appView.appElement.toggleElement.onclick = function(e) {
 		appView.appElement.hideSectionElement();
 	};
-	todosController.add("osman",true);
 	todosController.updateView();
 };
 Main.getTodos = function() {
@@ -136,6 +135,9 @@ controller.TodosController.prototype = {
 	,'delete': function(id) {
 		this.model["delete"](id);
 	}
+	,setCompleted: function(id,isCompleted) {
+		this.model.setCompleted(id,isCompleted);
+	}
 	,setTodos: function(list) {
 		this.model.set_list(list);
 	}
@@ -197,6 +199,10 @@ model.Todos.prototype = {
 	,'delete': function(id) {
 		var todo = this.getTodo(id);
 		this.list.remove(todo);
+	}
+	,setCompleted: function(id,isCompleted) {
+		var todo = this.getTodo(id);
+		todo.set_isCompleted(isCompleted);
 	}
 	,getTodo: function(id) {
 		var $it0 = this.list.iterator();
@@ -310,6 +316,18 @@ view.TodosElement.prototype = {
 view.TodosView = function() {
 	this.todosElement = new view.TodosElement();
 	var _g = this;
+	this.selected = window.document.body.getElementsByClassName("selected")[0];
+	this.selected.onclick = function(e) {
+		_g.viewController.updateView();
+	};
+	this.active = window.document.body.getElementsByClassName("selected")[0];
+	this.active.onclick = function(e1) {
+		_g.filterActive();
+	};
+	this.completed = window.document.body.getElementsByClassName("selected")[0];
+	this.completed.onclick = function(e2) {
+		_g.filterCompleted();
+	};
 	this.inputElement = window.document.body.getElementsByClassName("new-todo")[0];
 	this.inputElement.onkeypress = function(event) {
 		if(_g.inputElement.value != "" && (event.which == 13 || event.keyCode == 13)) {
@@ -332,6 +350,10 @@ view.TodosView.prototype = {
 		var todoView = new view.TodoView(id);
 		todoView.todoElement.buttonElement.onclick = function(e) {
 			_g["delete"](id);
+		};
+		todoView.todoElement.checkBoxElement.onclick = function(e1) {
+			_g.viewController.setCompleted(id,true);
+			_g.viewController.updateView();
 		};
 		todoView.updateTodo(title,isCompleted);
 		this.todosElement.add(todoView.todoElement);

@@ -38,6 +38,11 @@ class Todos
         this.list.remove(todo);
     }
 
+    public function setCompleted(id:Int,isCompleted:Bool):Void{
+        var todo = this.getTodo(id);
+        todo.set_isCompleted(isCompleted);
+    }
+
     public function getTodo(id:Int):Dynamic{
         for(todo in list){
             if(todo.id == id){

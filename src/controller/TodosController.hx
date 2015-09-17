@@ -77,6 +77,10 @@ class TodosController
         this.model.delete(id);
     }
 
+    public function setCompleted(id:Int,isCompleted:Bool){
+        this.model.setCompleted(id,isCompleted);
+    }
+
     public function setTodos(list:List<Todo>):Void{
         this.model.set_list(list);
     }
