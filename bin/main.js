@@ -38,20 +38,15 @@ List.prototype = {
 var Main = function() {
 };
 Main.main = function() {
-	var appElement = new view.AppElement();
+	var appView = new view.AppView();
 	var todos = Main.getTodos();
 	var todosView = new view.TodosView();
-	appElement.sectionElement.appendChild(todosView.todosElement.todosElement);
-	(function(f,e) {
-		return function() {
-			return f(e);
-		};
-	})($bind(appElement,appElement.doSomething),function(e1) {
-		console.log("mahmut");
-	});
+	appView.addToSection(todosView);
 	var todosController = new controller.TodosController(todos,todosView);
-	todosController.add("mahmut",false);
-	todosController.updateView();
+	todosView.set_viewController(todosController);
+	appView.appElement.toggleElement.onclick = function(e) {
+		appView.appElement.hideSectionElement();
+	};
 	todosController.add("osman",true);
 	todosController.updateView();
 };
@@ -101,23 +96,64 @@ controller.TodosController.prototype = {
 	}
 	,add: function(title,isCompleted) {
 		var todo = new model.Todo();
+		todo.id = this.model.counter;
 		todo.set_title(title);
 		todo.set_isCompleted(isCompleted);
 		this.model.add(todo);
 	}
-	,'delete': function(todo) {
-		this.model["delete"](todo);
+	,filterActive: function() {
+		var list = this.model.get_list();
+		var $it0 = list.iterator();
+		while( $it0.hasNext() ) {
+			var todo = $it0.next();
+			if(todo.get_isCompleted() == false) list.remove(todo);
+		}
+		this.updateView(list);
+	}
+	,filterCompleted: function() {
+		var list = this.model.get_list();
+		var $it0 = list.iterator();
+		while( $it0.hasNext() ) {
+			var todo = $it0.next();
+			if(todo.get_isCompleted() == true) list.remove(todo);
+		}
+		this.updateView(list);
+	}
+	,completeTodo: function(todo) {
+		todo.set_isCompleted(true);
+	}
+	,clearCompleted: function() {
+		var list = this.model.get_list();
+		var $it0 = list.iterator();
+		while( $it0.hasNext() ) {
+			var todo = $it0.next();
+			if(todo.get_isCompleted() == null) this.model["delete"](todo.id);
+		}
+	}
+	,getCount: function() {
+		return this.model.get_list().length;
+	}
+	,'delete': function(id) {
+		this.model["delete"](id);
 	}
 	,setTodos: function(list) {
 		this.model.set_list(list);
 	}
-	,updateView: function() {
-		var list = this.model.get_list();
+	,updateView: function(list) {
 		this.view.clear();
-		var $it0 = list.iterator();
-		while( $it0.hasNext() ) {
-			var todo = $it0.next();
-			this.view.add(todo.get_title(),todo.get_isCompleted());
+		if(list == null) {
+			var list1 = this.model.get_list();
+			var $it0 = list1.iterator();
+			while( $it0.hasNext() ) {
+				var todo = $it0.next();
+				this.view.add(todo.get_title(),todo.get_isCompleted(),todo.id);
+			}
+		} else {
+			var $it1 = list.iterator();
+			while( $it1.hasNext() ) {
+				var todo1 = $it1.next();
+				this.view.add(todo1.get_title(),todo1.get_isCompleted(),todo1.id);
+			}
 		}
 	}
 };
@@ -143,6 +179,7 @@ model.Todo.prototype = {
 	}
 };
 model.Todos = function() {
+	this.counter = 0;
 	this.set_list(new List());
 };
 model.Todos.prototype = {
@@ -155,9 +192,19 @@ model.Todos.prototype = {
 	}
 	,add: function(todo) {
 		this.list.add(todo);
+		this.counter++;
 	}
-	,'delete': function(todo) {
+	,'delete': function(id) {
+		var todo = this.getTodo(id);
 		this.list.remove(todo);
+	}
+	,getTodo: function(id) {
+		var $it0 = this.list.iterator();
+		while( $it0.hasNext() ) {
+			var todo = $it0.next();
+			if(todo.id == id) return todo;
+		}
+		return null;
 	}
 };
 var view = {};
@@ -165,24 +212,27 @@ view.AppElement = function() {
 	this.bodyElement = window.document.body;
 	this.inputElement = this.bodyElement.getElementsByClassName("new-todo")[0];
 	this.toggleElement = this.bodyElement.getElementsByClassName("toggle-all")[0];
-	this.toggleElement.onclick = $bind(this,this.doSomething);
 	this.sectionElement = this.bodyElement.getElementsByClassName("main")[0];
 	this.footerElement = this.bodyElement.getElementsByClassName("footer")[0];
-	this.hideSectionElement();
-	this.showSectionElement();
 };
 view.AppElement.prototype = {
-	doSomething: function(e) {
-		console.log("I did");
-	}
-	,hideSectionElement: function() {
+	hideSectionElement: function() {
 		this.sectionElement.style.display = "none";
 	}
 	,showSectionElement: function() {
 		this.sectionElement.style.display = "initial";
 	}
 };
-view.TodoElement = function(title,isCompleted) {
+view.AppView = function() {
+	this.appElement = new view.AppElement();
+};
+view.AppView.prototype = {
+	addToSection: function(todosView) {
+		var todosElement = todosView.todosElement.todosElement;
+		this.appElement.sectionElement.appendChild(todosElement);
+	}
+};
+view.TodoElement = function(title,isCompleted,id) {
 	if(isCompleted == null) isCompleted = false;
 	this.inputElement = (function($this) {
 		var $r;
@@ -221,6 +271,7 @@ view.TodoElement = function(title,isCompleted) {
 	this.buttonElement.className = "destroy";
 	this.divElement.appendChild(this.buttonElement);
 	this.listElement.appendChild(this.divElement);
+	this.listElement.setAttribute("data-id",id);
 	this.inputElement.className = "edit";
 	this.listElement.appendChild(this.inputElement);
 };
@@ -233,12 +284,15 @@ view.TodoElement.prototype = {
 		}
 	}
 };
-view.TodoView = function() {
-	this.todoElement = new view.TodoElement();
+view.TodoView = function(id) {
+	this.todoElement = new view.TodoElement(null,null,id);
 };
 view.TodoView.prototype = {
 	updateTodo: function(title,isCompleted) {
 		this.todoElement.update(title,isCompleted);
+	}
+	,deleteTodo: function() {
+		this.todoElement.listElement.parentElement.removeChild(this.todoElement.listElement);
 	}
 };
 view.TodosElement = function() {
@@ -255,20 +309,54 @@ view.TodosElement.prototype = {
 };
 view.TodosView = function() {
 	this.todosElement = new view.TodosElement();
+	var _g = this;
+	this.inputElement = window.document.body.getElementsByClassName("new-todo")[0];
+	this.inputElement.onkeypress = function(event) {
+		if(_g.inputElement.value != "" && (event.which == 13 || event.keyCode == 13)) {
+			_g.viewController.add(_g.inputElement.value,false);
+			_g.viewController.updateView();
+			return false;
+		}
+		return true;
+	};
 };
 view.TodosView.prototype = {
-	add: function(title,isCompleted) {
+	set_viewController: function(controller) {
+		this.viewController = controller;
+		return controller;
+	}
+	,add: function(title,isCompleted,id) {
 		if(isCompleted == null) isCompleted = false;
 		if(title == null) title = "";
-		var todoView = new view.TodoView();
+		var _g = this;
+		var todoView = new view.TodoView(id);
+		todoView.todoElement.buttonElement.onclick = function(e) {
+			_g["delete"](id);
+		};
 		todoView.updateTodo(title,isCompleted);
 		this.todosElement.add(todoView.todoElement);
+	}
+	,clearCompleted: function() {
+		this.viewController.clearCompleted();
+		this.viewController.updateView();
+	}
+	,filterCompleted: function() {
+		this.viewController.filterCompleted();
+		this.viewController.updateView();
+	}
+	,filterActive: function() {
+		this.viewController.filterActive();
+		this.viewController.updateView();
+	}
+	,'delete': function(id) {
+		this.viewController["delete"](id);
+		this.viewController.updateView();
+	}
+	,edit: function() {
 	}
 	,clear: function() {
 		this.todosElement.clear();
 	}
 };
-var $_, $fid = 0;
-function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 Main.main();
 })();

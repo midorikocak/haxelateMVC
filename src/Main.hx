@@ -4,6 +4,8 @@ package ;
 *
 * @package
 **/
+import js.html.EventListener;
+import view.AppView;
 import view.AppElement;
 import view.TodoElement;
 import controller.TodoController;
@@ -27,17 +29,22 @@ class Main
 
     public static function main()
     {
-        var appElement:AppElement = new AppElement();
+        var appView:AppView = new AppView();
+
         var todos:Todos = getTodos();
         var todosView:TodosView = new TodosView();
-        appElement.sectionElement.appendChild(todosView.todosElement.todosElement);
+
+        appView.addToSection(todosView);
+
 
         var todosController:TodosController = new TodosController(todos,todosView);
-        todosController.add('mahmut',false);
 
-        todosController.updateView();
+        //If user input, controller should be present
+        todosView.set_viewController(todosController);
 
-        todosController.add('osman',true);
+        appView.appElement.toggleElement.onclick = function(e:EventListener){
+            appView.appElement.hideSectionElement();
+        };
 
         todosController.updateView();
     }

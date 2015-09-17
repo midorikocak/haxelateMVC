@@ -24,18 +24,11 @@ class AppElement
     {
        inputElement = cast bodyElement.getElementsByClassName('new-todo')[0];
        toggleElement = cast bodyElement.getElementsByClassName('toggle-all')[0];
-        toggleElement.onclick = doSomething;
 
        sectionElement = cast bodyElement.getElementsByClassName('main')[0];
        footerElement = cast bodyElement.getElementsByClassName('footer')[0];
-
-        hideSectionElement();
-        showSectionElement();
     }
 
-    public function doSomething(e:EventListener){
-        trace('I did');
-    }
 
     public function hideSectionElement(){
         sectionElement.style.display = "none";

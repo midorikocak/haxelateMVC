@@ -9,6 +9,7 @@ import js.html.Storage;
 class Todos
 {
     var list(default,set_list):List<Todo>;
+    public var counter:Int = 0;
     /**
     * Class Constructor
     * @return void
@@ -29,9 +30,21 @@ class Todos
 
     public function add(todo:Todo):Void{
         this.list.add(todo);
+        counter++;
     }
 
-    public function delete(todo:Todo):Void{
+    public function delete(id:Int):Void{
+        var todo = this.getTodo(id);
         this.list.remove(todo);
     }
+
+    public function getTodo(id:Int):Dynamic{
+        for(todo in list){
+            if(todo.id == id){
+                return todo;
+            }
+        }
+        return null;
+    }
+
 }

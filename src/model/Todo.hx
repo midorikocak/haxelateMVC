@@ -7,6 +7,7 @@ package model;
 **/
 class Todo
 {
+    public var id:Int;
     var title(default,set_title):String;
     var isCompleted(default,set_isCompleted):Bool;
     /**

@@ -17,13 +17,13 @@ class TodoElement
     var divElement:Element =  js.Browser.document.createElement('div');
     var checkBoxElement:InputElement = js.Browser.document.createInputElement();
     var labelElement:LabelElement = js.Browser.document.createLabelElement();
-    var buttonElement:ButtonElement = js.Browser.document.createButtonElement();
-    var inputElement:InputElement = js.Browser.document.createInputElement();
+    public var buttonElement:ButtonElement = js.Browser.document.createButtonElement();
+    public var inputElement:InputElement = js.Browser.document.createInputElement();
     /**
     * Class Constructor
     * @return void
     **/
-    public function new(?title:String,?isCompleted:Bool = false)
+    public function new(?title:String,?isCompleted:Bool = false,id:Int)
     {
         this.title = title;
         this.isCompleted = isCompleted;
@@ -44,6 +44,7 @@ class TodoElement
         divElement.appendChild(buttonElement);
 
         listElement.appendChild(divElement);
+        listElement.setAttribute('data-id',cast id);
 
         inputElement.className = 'edit';
 

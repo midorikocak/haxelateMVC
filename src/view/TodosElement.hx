@@ -5,6 +5,7 @@ package view;
 * @author Midori Kocak github.com/mtkocak
 * @package view
 **/
+import js.html.EventListener;
 import js.html.Element;
 class TodosElement
 {
