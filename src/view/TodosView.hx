@@ -5,6 +5,7 @@ package view;
 * @author Midori Kocak github.com/mtkocak
 * @package view
 **/
+import js.html.ButtonElement;
 import js.html.InputElement;
 import js.html.Node;
 import js.html.Element;
@@ -17,8 +18,10 @@ class TodosView
     public var inputElement:InputElement;
     public var active:Element;
     public var completed:Element;
+    public var clearCompletedButton:ButtonElement;
     public var selected:Element;
     public var viewController(default, set_viewController):TodosController;
+    public var counterElement:Element;
     /**
     * Class Constructor
     * @return void
@@ -31,19 +34,28 @@ class TodosView
             viewController.updateView();
         };
 
-        active = cast js.Browser.document.body.getElementsByClassName('selected')[0];
+        counterElement = cast js.Browser.document.body.getElementsByClassName('todo-count')[0];
+
+
+        active = cast js.Browser.document.body.getElementsByClassName('active')[0];
         active.onclick = function(e:EventListener){
             filterActive();
         };
-        completed = cast js.Browser.document.body.getElementsByClassName('selected')[0];
+        completed = cast js.Browser.document.body.getElementsByClassName('completed')[0];
         completed.onclick = function(e:EventListener){
             filterCompleted();
         };
+
+        clearCompletedButton = cast js.Browser.document.body.getElementsByClassName(' clear-completed')[0];
+        clearCompletedButton.onclick = function(e:EventListener){
+            clearCompleted();
+        }
         inputElement = cast js.Browser.document.body.getElementsByClassName('new-todo')[0];
         inputElement.onkeypress = function (event:Dynamic) {
             if ((inputElement.value!="")&& (event.which == 13 || event.keyCode == 13)) {
                 viewController.add(inputElement.value,false);
                 viewController.updateView();
+                inputElement.value = "";
                 return false;
             }
             return true;
@@ -65,7 +77,7 @@ class TodosView
         };
 
         todoView.todoElement.checkBoxElement.onclick = function(e:EventListener){
-            viewController.setCompleted(id,true);
+            viewController.setCompleted(id, !viewController.getCompleted(id));
             viewController.updateView();
         }
         todoView.updateTodo(title, isCompleted);
@@ -74,23 +86,24 @@ class TodosView
 
     public function clearCompleted():Void{
         viewController.clearCompleted();
-        viewController.updateView();
     }
 
     public function filterCompleted():Void{
         viewController.filterCompleted();
-        viewController.updateView();
     }
 
     public function filterActive():Void{
         viewController.filterActive();
-        viewController.updateView();
     }
 
     public function delete(id:Int)
     {
         viewController.delete(id);
         viewController.updateView();
+    }
+
+    public function changeCounter(counter:Int){
+        this.counterElement.firstChild.textContent = cast counter;
     }
 
     public function edit(){

@@ -34,6 +34,16 @@ List.prototype = {
 			return x;
 		}};
 	}
+	,filter: function(f) {
+		var l2 = new List();
+		var l = this.h;
+		while(l != null) {
+			var v = l[0];
+			l = l[1];
+			if(f(v)) l2.add(v);
+		}
+		return l2;
+	}
 };
 var Main = function() {
 };
@@ -102,21 +112,24 @@ controller.TodosController.prototype = {
 	}
 	,filterActive: function() {
 		var list = this.model.get_list();
-		var $it0 = list.iterator();
-		while( $it0.hasNext() ) {
-			var todo = $it0.next();
-			if(todo.get_isCompleted() == false) list.remove(todo);
-		}
-		this.updateView(list);
+		var active = list.filter(function(todo) {
+			return !todo.get_isCompleted();
+		});
+		this.updateView(active);
+	}
+	,countActive: function() {
+		var list = this.model.get_list();
+		var active = list.filter(function(todo) {
+			return !todo.get_isCompleted();
+		});
+		return active.length;
 	}
 	,filterCompleted: function() {
 		var list = this.model.get_list();
-		var $it0 = list.iterator();
-		while( $it0.hasNext() ) {
-			var todo = $it0.next();
-			if(todo.get_isCompleted() == true) list.remove(todo);
-		}
-		this.updateView(list);
+		var completed = list.filter(function(todo) {
+			return todo.get_isCompleted();
+		});
+		this.updateView(completed);
 	}
 	,completeTodo: function(todo) {
 		todo.set_isCompleted(true);
@@ -126,8 +139,9 @@ controller.TodosController.prototype = {
 		var $it0 = list.iterator();
 		while( $it0.hasNext() ) {
 			var todo = $it0.next();
-			if(todo.get_isCompleted() == null) this.model["delete"](todo.id);
+			if(todo.get_isCompleted() == true) this.model["delete"](todo.id);
 		}
+		this.updateView(list);
 	}
 	,getCount: function() {
 		return this.model.get_list().length;
@@ -137,6 +151,9 @@ controller.TodosController.prototype = {
 	}
 	,setCompleted: function(id,isCompleted) {
 		this.model.setCompleted(id,isCompleted);
+	}
+	,getCompleted: function(id) {
+		return this.model.getCompleted(id);
 	}
 	,setTodos: function(list) {
 		this.model.set_list(list);
@@ -157,6 +174,7 @@ controller.TodosController.prototype = {
 				this.view.add(todo1.get_title(),todo1.get_isCompleted(),todo1.id);
 			}
 		}
+		this.view.changeCounter(this.countActive());
 	}
 };
 var model = {};
@@ -203,6 +221,10 @@ model.Todos.prototype = {
 	,setCompleted: function(id,isCompleted) {
 		var todo = this.getTodo(id);
 		todo.set_isCompleted(isCompleted);
+	}
+	,getCompleted: function(id) {
+		var todo = this.getTodo(id);
+		return todo.get_isCompleted();
 	}
 	,getTodo: function(id) {
 		var $it0 = this.list.iterator();
@@ -320,19 +342,25 @@ view.TodosView = function() {
 	this.selected.onclick = function(e) {
 		_g.viewController.updateView();
 	};
-	this.active = window.document.body.getElementsByClassName("selected")[0];
+	this.counterElement = window.document.body.getElementsByClassName("todo-count")[0];
+	this.active = window.document.body.getElementsByClassName("active")[0];
 	this.active.onclick = function(e1) {
 		_g.filterActive();
 	};
-	this.completed = window.document.body.getElementsByClassName("selected")[0];
+	this.completed = window.document.body.getElementsByClassName("completed")[0];
 	this.completed.onclick = function(e2) {
 		_g.filterCompleted();
+	};
+	this.clearCompletedButton = window.document.body.getElementsByClassName(" clear-completed")[0];
+	this.clearCompletedButton.onclick = function(e3) {
+		_g.clearCompleted();
 	};
 	this.inputElement = window.document.body.getElementsByClassName("new-todo")[0];
 	this.inputElement.onkeypress = function(event) {
 		if(_g.inputElement.value != "" && (event.which == 13 || event.keyCode == 13)) {
 			_g.viewController.add(_g.inputElement.value,false);
 			_g.viewController.updateView();
+			_g.inputElement.value = "";
 			return false;
 		}
 		return true;
@@ -352,7 +380,7 @@ view.TodosView.prototype = {
 			_g["delete"](id);
 		};
 		todoView.todoElement.checkBoxElement.onclick = function(e1) {
-			_g.viewController.setCompleted(id,true);
+			_g.viewController.setCompleted(id,!_g.viewController.getCompleted(id));
 			_g.viewController.updateView();
 		};
 		todoView.updateTodo(title,isCompleted);
@@ -360,19 +388,19 @@ view.TodosView.prototype = {
 	}
 	,clearCompleted: function() {
 		this.viewController.clearCompleted();
-		this.viewController.updateView();
 	}
 	,filterCompleted: function() {
 		this.viewController.filterCompleted();
-		this.viewController.updateView();
 	}
 	,filterActive: function() {
 		this.viewController.filterActive();
-		this.viewController.updateView();
 	}
 	,'delete': function(id) {
 		this.viewController["delete"](id);
 		this.viewController.updateView();
+	}
+	,changeCounter: function(counter) {
+		this.counterElement.firstChild.textContent = counter;
 	}
 	,edit: function() {
 	}

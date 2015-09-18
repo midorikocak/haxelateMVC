@@ -43,6 +43,11 @@ class Todos
         todo.set_isCompleted(isCompleted);
     }
 
+    public function getCompleted(id:Int):Bool{
+        var todo = this.getTodo(id);
+        return todo.get_isCompleted();
+    }
+
     public function getTodo(id:Int):Dynamic{
         for(todo in list){
             if(todo.id == id){

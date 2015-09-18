@@ -38,22 +38,26 @@ class TodosController
 
     public function filterActive(){
         var list:List<Todo> = this.model.get_list();
-        for (todo in list){
-            if (todo.get_isCompleted()==false){
-                list.remove(todo);
-            }
-        }
-        this.updateView(list);
+        var active:List<Todo> = list.filter(function(todo:Todo){
+            return !todo.get_isCompleted();
+        });
+        this.updateView(active);
+    }
+
+    public function countActive():Int{
+        var list:List<Todo> = this.model.get_list();
+        var active:List<Todo> = list.filter(function(todo:Todo){
+            return !todo.get_isCompleted();
+        });
+        return active.length;
     }
 
     public function filterCompleted(){
         var list:List<Todo> = this.model.get_list();
-        for (todo in list){
-            if (todo.get_isCompleted()==true){
-                list.remove(todo);
-            }
-        }
-        this.updateView(list);
+        var completed:List<Todo> = list.filter(function(todo:Todo){
+            return todo.get_isCompleted();
+        });
+        this.updateView(completed);
     }
 
     public function completeTodo(todo:Todo){
@@ -63,10 +67,11 @@ class TodosController
     public function clearCompleted(){
         var list:List<Todo> = this.model.get_list();
         for (todo in list){
-            if (todo.get_isCompleted()==null){
+            if (todo.get_isCompleted()==true){
                 this.model.delete(todo.id);
             }
         }
+        this.updateView(list);
     }
 
     public function getCount():Int{
@@ -79,6 +84,10 @@ class TodosController
 
     public function setCompleted(id:Int,isCompleted:Bool){
         this.model.setCompleted(id,isCompleted);
+    }
+
+    public function getCompleted(id:Int):Bool{
+       return this.model.getCompleted(id);
     }
 
     public function setTodos(list:List<Todo>):Void{
@@ -97,5 +106,6 @@ class TodosController
                 this.view.add(todo.get_title(), todo.get_isCompleted(),todo.id);
             }
         }
+        this.view.changeCounter(this.countActive());
     }
 }
